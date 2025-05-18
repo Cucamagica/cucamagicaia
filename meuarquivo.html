@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Correção Automática de Redação</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], select, input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 15px;
+      background: #e7f3e7;
+      border-left: 6px solid #4CAF50;
+    }
+    .error {
+      margin-top: 20px;
+      padding: 15px;
+      background: #ffeaea;
+      border-left: 6px solid #f44336;
+      color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Correção Automática de Redação</h1>
+
+    <form id="redacaoForm">
+      <label for="nome">Nome do Aluno:</label>
+      <input type="text" id="nome" name="nome" required>
+
+      <label for="nivel">Nível da Redação:</label>
+      <select id="nivel" name="nivel" required>
+        <option value="">Selecione o nível</option>
+        <option value="enem">ENEM</option>
+        <option value="ensino-medio">Ensino Médio</option>
+        <option value="ensino-fundamental-1">Ensino Fundamental - 1º Ciclo</option>
+        <option value="ensino-fundamental-2">Ensino Fundamental - 2º Ciclo</option>
+      </select>
+
+      <label for="redacaoFile">Anexar Prova de Redação (.txt, .docx ou .pdf):</label>
+      <input type="file" id="redacaoFile" name="redacaoFile" accept=".txt,.docx,.pdf" required>
+
+      <button type="submit">Corrigir Redação</button>
+    </form>
+
+    <div id="errorMessage" class="error" style="display:none;">
+      Por favor, selecione um arquivo válido.
+    </div>
+
+    <div id="resultBox" class="result" style="display:none;">
+      <h2>Relatório de Correção</h2>
+      <p><strong>Aluno:</strong> <span id="nomeResultado"></span></p>
+      <p><strong>Nível:</strong> <span id="nivelResultado"></span></p>
+      <p><strong>Nota Sugerida:</strong> <span id="notaResultado"></span></p>
+      <p><strong>Pontos Positivos:</strong><br><span id="positivosResultado"></span></p>
+      <p><strong>Pontos a Melhorar:</strong><br><span id="negativosResultado"></span></p>
+      <button onclick="downloadPDF()">Baixar Relatório em PDF</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js "></script>
+  <script>
+    document.getElementById('redacaoForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const nivel = document.getElementById('nivel').value.toLowerCase();
+      const redacaoFile = document.getElementById('redacaoFile').files[0];
+
+      // Limpar mensagens
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('resultBox').style.display = 'none';
+
+      if (!redacaoFile || !['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'].includes(redacaoFile.type)) {
+        document.getElementById('errorMessage').style.display = 'block';
+        return;
+      }
+
+      // Simulação de correção (substituir por leitura do conteúdo do arquivo no futuro)
+      let nota = 0;
+      let positivos = '';
+      let negativos = '';
+
+      switch(nivel) {
+        case 'enem':
+          nota = 820;
+          positivos = "Boa estrutura e argumentação coerente.";
+          negativos = "Melhorar introdução e conclusão com propostas claras.";
+          break;
+        case 'ensino-medio':
+          nota = 9.0;
+          positivos = "Linguagem clara e boa organização textual.";
+          negativos = "Erros gramaticais pontuais e repetição de ideias.";
+          break;
+        case 'ensino-fundamental-1':
+          nota = 6.5;
+          positivos = "Ideias criativas e tentativa de coesão.";
+          negativos = "Falta desenvolvimento das ideias e erros básicos de escrita.";
+          break;
+        case 'ensino-fundamental-2':
+          nota = 7.8;
+          positivos = "Boa compreensão do tema e uso adequado de conectivos.";
+          negativos = "Falta aprofundamento dos argumentos e uso incorreto de pontuação.";
+          break;
+        default:
+          alert("Selecione um nível válido.");
+          return;
+      }
+
+      // Atualizar resultados na tela
+      document.getElementById('nomeResultado').textContent = nome;
+      document.getElementById('nivelResultado').textContent = nivel;
+      document.getElementById('notaResultado').textContent = nota;
+      document.getElementById('positivosResultado').textContent = positivos;
+      document.getElementById('negativosResultado').textContent = negativos;
+      document.getElementById('resultBox').style.display = 'block';
+    });
+
+    function downloadPDF() {
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Relatório de Correção", 20, 20);
+
+      doc.setFontSize(12);
+      doc.text(`Aluno: ${document.getElementById('nomeResultado').textContent}`, 20, 35);
+      doc.text(`Nível: ${document.getElementById('nivelResultado').textContent}`, 20, 45);
+      doc.text(`Nota sugerida: ${document.getElementById('notaResultado').textContent}`, 20, 55);
+      doc.text("Pontos positivos:", 20, 70);
+      doc.text(document.getElementById('positivosResultado').textContent, 20, 80);
+      doc.text("Pontos a melhorar:", 20, 100);
+      doc.text(document.getElementById('negativosResultado').textContent, 20, 110);
+
+      doc.save(`relatorio-correcao-${document.getElementById('nomeResultado').textContent}.pdf`);
+    }
+  </script>
+</body>
+</html>
